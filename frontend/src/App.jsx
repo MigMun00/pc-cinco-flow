@@ -12,7 +12,7 @@ function App() {
   const testBackend = async () => {
     const token = await getToken();
 
-    const res = await fetch("http://127.0.0.1:8000/api/v1/me", {
+    const res = await fetch("http://127.0.0.1:8000/me", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -20,6 +20,7 @@ function App() {
 
     const data = await res.json();
     console.log(data);
+    console.log(token);
   };
 
   return (
