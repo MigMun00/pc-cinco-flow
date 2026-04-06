@@ -6,8 +6,8 @@ export default function MainLayout() {
     <div className="flex h-screen bg-(--background)">
       {/* Sidebar */}
       <aside className="w-64 bg-(--surface) border-r border-(--border) p-4">
-        <div className="mb-8 flex justify-center items-center gap-3 px-2">
-          <img src="/logo.jpg" alt="PC Cinco" className="w-25 object-contain" />
+        <div className="mb-4 flex justify-center items-center gap-3 px-2">
+          <img src="/logo.png" alt="PC Cinco" className="w-35 object-contain" />
         </div>
 
         <nav className="flex flex-col gap-2">
