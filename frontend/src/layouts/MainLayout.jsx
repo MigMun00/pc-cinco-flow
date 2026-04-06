@@ -12,6 +12,7 @@ export default function MainLayout() {
 
         <nav className="flex flex-col gap-2">
           <NavItem to="/" label="Dashboard" />
+          <NavItem to="/clients" label="Clients" />
           <NavItem to="/projects" label="Projects" />
           <NavItem to="/services" label="Services" />
         </nav>

@@ -3,6 +3,7 @@ import { useUser } from "@clerk/react";
 
 import MainLayout from "../layouts/MainLayout";
 import Dashboard from "../pages/Dashboard";
+import Clients from "../pages/Clients";
 import Projects from "../pages/Projects";
 import Services from "../pages/Services";
 import Login from "../pages/Login";
@@ -32,6 +33,7 @@ export default function AppRouter() {
           }
         >
           <Route path="/" element={<Dashboard />} />
+          <Route path="/clients" element={<Clients />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/services" element={<Services />} />
         </Route>
