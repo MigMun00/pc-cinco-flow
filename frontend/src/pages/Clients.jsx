@@ -6,10 +6,11 @@ import {
   updateClient,
   deleteClient,
 } from "../services/client";
-import Modal from "../components/Modal";
 import Field from "../components/Field";
 import PageHeader from "../components/PageHeader";
-import RowActions from "../components/RowActions";
+import CrudState from "../components/CrudState";
+import CrudTable from "../components/CrudTable";
+import CrudFormModal from "../components/CrudFormModal";
 
 const EMPTY = { name: "", email: "", phone: "" };
 
@@ -70,6 +71,25 @@ export default function Clients() {
     }
   }
 
+  const columns = [
+    {
+      key: "name",
+      header: "Nombre",
+      cellClassName: "text-(--text) font-medium",
+      render: (client) => client.name,
+    },
+    {
+      key: "email",
+      header: "Correo",
+      render: (client) => client.email ?? "—",
+    },
+    {
+      key: "phone",
+      header: "Telefono",
+      render: (client) => client.phone ?? "—",
+    },
+  ];
+
   return (
     <div>
       <PageHeader
@@ -78,97 +98,56 @@ export default function Clients() {
         onAction={() => setModal(EMPTY)}
       />
 
-      {loading && <p className="text-(--muted) text-sm">Cargando…</p>}
-      {error && <p className="text-(--danger) text-sm">{error}</p>}
-      {!loading && !error && clients.length === 0 && (
-        <p className="text-(--muted) text-sm">
-          No hay clientes aún. Agrega el primero.
-        </p>
-      )}
+      <CrudState
+        loading={loading}
+        error={error}
+        isEmpty={!loading && !error && clients.length === 0}
+        emptyMessage="No hay clientes aun. Agrega el primero."
+      />
 
       {!loading && !error && clients.length > 0 && (
-        <div className="bg-(--surface) rounded-xl border border-(--border) overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-(--border) text-(--muted) text-left">
-                <th className="px-4 py-3 font-medium">Nombre</th>
-                <th className="px-4 py-3 font-medium">Correo</th>
-                <th className="px-4 py-3 font-medium">Teléfono</th>
-                <th className="px-4 py-3 w-32" />
-              </tr>
-            </thead>
-            <tbody>
-              {clients.map((c) => (
-                <tr
-                  key={c.id}
-                  className="border-b border-(--border) last:border-0 hover:bg-(--background)/40 transition-colors"
-                >
-                  <td className="px-4 py-3 text-(--text) font-medium">
-                    {c.name}
-                  </td>
-                  <td className="px-4 py-3 text-(--muted)">{c.email ?? "—"}</td>
-                  <td className="px-4 py-3 text-(--muted)">{c.phone ?? "—"}</td>
-                  <td className="px-4 py-3">
-                    <RowActions
-                      onEdit={() =>
-                        setModal({
-                          id: c.id,
-                          name: c.name,
-                          email: c.email ?? "",
-                          phone: c.phone ?? "",
-                        })
-                      }
-                      onDelete={() => handleDelete(c)}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <CrudTable
+          rows={clients}
+          columns={columns}
+          getRowKey={(client) => client.id}
+          onEdit={(client) =>
+            setModal({
+              id: client.id,
+              name: client.name,
+              email: client.email ?? "",
+              phone: client.phone ?? "",
+            })
+          }
+          onDelete={handleDelete}
+        />
       )}
 
       {modal && (
-        <Modal
+        <CrudFormModal
           title={modal.id ? "Editar Cliente" : "Nuevo Cliente"}
           onClose={() => setModal(null)}
+          onSubmit={handleSubmit}
+          saving={saving}
+          isEdit={Boolean(modal.id)}
         >
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <Field
-              label="Nombre"
-              value={modal.name}
-              onChange={(v) => setModal((m) => ({ ...m, name: v }))}
-              required
-            />
-            <Field
-              label="Correo"
-              type="email"
-              value={modal.email}
-              onChange={(v) => setModal((m) => ({ ...m, email: v }))}
-            />
-            <Field
-              label="Teléfono"
-              value={modal.phone}
-              onChange={(v) => setModal((m) => ({ ...m, phone: v }))}
-            />
-            <div className="flex gap-3 justify-end pt-2">
-              <button
-                type="button"
-                onClick={() => setModal(null)}
-                className="px-4 py-2 text-sm text-(--muted) hover:text-(--text) transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                disabled={saving}
-                className="px-4 py-2 bg-(--primary) text-(--text) text-sm font-medium rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity"
-              >
-                {saving ? "Guardando…" : modal.id ? "Guardar Cambios" : "Crear"}
-              </button>
-            </div>
-          </form>
-        </Modal>
+          <Field
+            label="Nombre"
+            value={modal.name}
+            onChange={(v) => setModal((m) => ({ ...m, name: v }))}
+            required
+          />
+          <Field
+            label="Correo"
+            type="email"
+            value={modal.email}
+            onChange={(v) => setModal((m) => ({ ...m, email: v }))}
+          />
+          <Field
+            label="Telefono"
+            value={modal.phone}
+            onChange={(v) => setModal((m) => ({ ...m, phone: v }))}
+          />
+        </CrudFormModal>
       )}
     </div>
   );

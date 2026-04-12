@@ -10,10 +10,13 @@ import {
 import { getClients } from "../services/client";
 import { getProjectExpenses } from "../services/projectExpense";
 import { fmtDate } from "../services/api";
-import Modal from "../components/Modal";
 import Field from "../components/Field";
 import PageHeader from "../components/PageHeader";
-import RowActions from "../components/RowActions";
+import CrudState from "../components/CrudState";
+import InvoicedBadge from "../components/InvoicedBadge";
+import ClientSelectField from "../components/ClientSelectField";
+import CrudTable from "../components/CrudTable";
+import CrudFormModal from "../components/CrudFormModal";
 
 const EMPTY = {
   name: "",
@@ -104,6 +107,48 @@ export default function Projects() {
     }
   }
 
+  const columns = [
+    {
+      key: "name",
+      header: "Nombre",
+      cellClassName: "font-medium",
+      render: (project) => (
+        <Link
+          to={`/projects/${project.id}`}
+          className="text-(--primary) hover:underline"
+        >
+          {project.name}
+        </Link>
+      ),
+    },
+    {
+      key: "client",
+      header: "Cliente",
+      render: (project) => clientName(project.client_id),
+    },
+    {
+      key: "description",
+      header: "Descripcion",
+      cellClassName: "text-(--muted) max-w-xs truncate",
+      render: (project) => project.description ?? "—",
+    },
+    {
+      key: "charge",
+      header: "Cobro",
+      render: (project) => `$${projectCharge(project).toFixed(2)}`,
+    },
+    {
+      key: "invoiced",
+      header: "Facturado",
+      render: (project) => <InvoicedBadge invoiced={project.invoiced} />,
+    },
+    {
+      key: "created",
+      header: "Creado",
+      render: (project) => fmtDate(project.created_at),
+    },
+  ];
+
   return (
     <div>
       <PageHeader
@@ -112,163 +157,82 @@ export default function Projects() {
         onAction={() => setModal(EMPTY)}
       />
 
-      {loading && <p className="text-(--muted) text-sm">Cargando…</p>}
-      {error && <p className="text-(--danger) text-sm">{error}</p>}
-      {!loading && !error && projects.length === 0 && (
-        <p className="text-(--muted) text-sm">
-          No hay proyectos aún. Agrega el primero.
-        </p>
-      )}
+      <CrudState
+        loading={loading}
+        error={error}
+        isEmpty={!loading && !error && projects.length === 0}
+        emptyMessage="No hay proyectos aun. Agrega el primero."
+      />
 
       {!loading && !error && projects.length > 0 && (
-        <div className="bg-(--surface) rounded-xl border border-(--border) overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-(--border) text-(--muted) text-left">
-                <th className="px-4 py-3 font-medium">Nombre</th>
-                <th className="px-4 py-3 font-medium">Cliente</th>
-                <th className="px-4 py-3 font-medium">Descripción</th>
-                <th className="px-4 py-3 font-medium">Cobro</th>
-                <th className="px-4 py-3 font-medium">Facturado</th>
-                <th className="px-4 py-3 font-medium">Creado</th>
-                <th className="px-4 py-3 w-32" />
-              </tr>
-            </thead>
-            <tbody>
-              {projects.map((p) => (
-                <tr
-                  key={p.id}
-                  className="border-b border-(--border) last:border-0 hover:bg-(--background)/40 transition-colors"
-                >
-                  <td className="px-4 py-3 font-medium">
-                    <Link
-                      to={`/projects/${p.id}`}
-                      className="text-(--primary) hover:underline"
-                    >
-                      {p.name}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-(--muted)">
-                    {clientName(p.client_id)}
-                  </td>
-                  <td className="px-4 py-3 text-(--muted) max-w-xs truncate">
-                    {p.description ?? "—"}
-                  </td>
-                  <td className="px-4 py-3 text-(--muted)">
-                    ${projectCharge(p).toFixed(2)}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`text-xs font-medium px-2 py-0.5 rounded-full ${p.invoiced ? "bg-green-900/40 text-(--success)" : "bg-(--background) text-(--muted)"}`}
-                    >
-                      {p.invoiced ? "Facturado" : "Pendiente"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-(--muted)">
-                    {fmtDate(p.created_at)}
-                  </td>
-                  <td className="px-4 py-3">
-                    <RowActions
-                      onEdit={() =>
-                        setModal({
-                          id: p.id,
-                          name: p.name,
-                          description: p.description ?? "",
-                          client_id: p.client_id,
-                          win_margin: p.win_margin,
-                          custom_fee: p.custom_fee ?? 0,
-                          invoiced: p.invoiced,
-                        })
-                      }
-                      onDelete={() => handleDelete(p)}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <CrudTable
+          rows={projects}
+          columns={columns}
+          getRowKey={(project) => project.id}
+          onEdit={(project) =>
+            setModal({
+              id: project.id,
+              name: project.name,
+              description: project.description ?? "",
+              client_id: project.client_id,
+              win_margin: project.win_margin,
+              custom_fee: project.custom_fee ?? 0,
+              invoiced: project.invoiced,
+            })
+          }
+          onDelete={handleDelete}
+        />
       )}
 
       {modal && (
-        <Modal
+        <CrudFormModal
           title={modal.id ? "Editar Proyecto" : "Nuevo Proyecto"}
           onClose={() => setModal(null)}
+          onSubmit={handleSubmit}
+          saving={saving}
+          isEdit={Boolean(modal.id)}
         >
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <Field
-              label="Nombre"
-              value={modal.name}
-              onChange={(v) => setModal((m) => ({ ...m, name: v }))}
-              required
+          <Field
+            label="Nombre"
+            value={modal.name}
+            onChange={(v) => setModal((m) => ({ ...m, name: v }))}
+            required
+          />
+          <Field
+            label="Descripcion"
+            value={modal.description}
+            onChange={(v) => setModal((m) => ({ ...m, description: v }))}
+          />
+          <ClientSelectField
+            value={modal.client_id}
+            clients={clients}
+            onChange={(value) => setModal((m) => ({ ...m, client_id: value }))}
+          />
+          <Field
+            label="Margen de Ganancia (%)"
+            type="number"
+            value={modal.win_margin}
+            onChange={(v) => setModal((m) => ({ ...m, win_margin: v }))}
+            required
+          />
+          <Field
+            label="Cargo Adicional ($)"
+            type="number"
+            value={modal.custom_fee}
+            onChange={(v) => setModal((m) => ({ ...m, custom_fee: v }))}
+          />
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={modal.invoiced}
+              onChange={(e) =>
+                setModal((m) => ({ ...m, invoiced: e.target.checked }))
+              }
+              className="w-4 h-4 accent-(--primary)"
             />
-            <Field
-              label="Descripción"
-              value={modal.description}
-              onChange={(v) => setModal((m) => ({ ...m, description: v }))}
-            />
-            <label className="flex flex-col gap-1">
-              <span className="text-xs font-medium text-(--muted) uppercase tracking-wide">
-                Cliente
-              </span>
-              <select
-                required
-                value={modal.client_id}
-                onChange={(e) =>
-                  setModal((m) => ({ ...m, client_id: e.target.value }))
-                }
-                className="bg-(--background) border border-(--border) rounded-lg px-3 py-2 text-sm text-(--text) focus:outline-none focus:border-(--primary) transition-colors"
-              >
-                <option value="">Selecciona un cliente…</option>
-                {clients.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <Field
-              label="Margen de Ganancia (%)"
-              type="number"
-              value={modal.win_margin}
-              onChange={(v) => setModal((m) => ({ ...m, win_margin: v }))}
-              required
-            />
-            <Field
-              label="Cargo Adicional ($)"
-              type="number"
-              value={modal.custom_fee}
-              onChange={(v) => setModal((m) => ({ ...m, custom_fee: v }))}
-            />
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={modal.invoiced}
-                onChange={(e) =>
-                  setModal((m) => ({ ...m, invoiced: e.target.checked }))
-                }
-                className="w-4 h-4 accent-(--primary)"
-              />
-              <span className="text-sm text-(--text)">Facturado</span>
-            </label>
-            <div className="flex gap-3 justify-end pt-2">
-              <button
-                type="button"
-                onClick={() => setModal(null)}
-                className="px-4 py-2 text-sm text-(--muted) hover:text-(--text) transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                disabled={saving}
-                className="px-4 py-2 bg-(--primary) text-white text-sm font-medium rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity"
-              >
-                {saving ? "Guardando…" : modal.id ? "Guardar Cambios" : "Crear"}
-              </button>
-            </div>
-          </form>
-        </Modal>
+            <span className="text-sm text-(--text)">Facturado</span>
+          </label>
+        </CrudFormModal>
       )}
     </div>
   );
