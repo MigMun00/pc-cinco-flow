@@ -61,7 +61,7 @@ export default function Clients() {
   }
 
   async function handleDelete({ id, name }) {
-    if (!window.confirm(`Delete "${name}"?`)) return;
+    if (!window.confirm(`¿Eliminar "${name}"?`)) return;
     try {
       await deleteClient(await getToken(), id);
       setClients((prev) => prev.filter((c) => c.id !== id));
@@ -73,16 +73,16 @@ export default function Clients() {
   return (
     <div>
       <PageHeader
-        title="Clients"
-        action="+ New Client"
+        title="Clientes"
+        action="+ Nuevo Cliente"
         onAction={() => setModal(EMPTY)}
       />
 
-      {loading && <p className="text-(--muted) text-sm">Loading…</p>}
+      {loading && <p className="text-(--muted) text-sm">Cargando…</p>}
       {error && <p className="text-(--danger) text-sm">{error}</p>}
       {!loading && !error && clients.length === 0 && (
         <p className="text-(--muted) text-sm">
-          No clients yet. Add your first one.
+          No hay clientes aún. Agrega el primero.
         </p>
       )}
 
@@ -91,9 +91,9 @@ export default function Clients() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-(--border) text-(--muted) text-left">
-                <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">Email</th>
-                <th className="px-4 py-3 font-medium">Phone</th>
+                <th className="px-4 py-3 font-medium">Nombre</th>
+                <th className="px-4 py-3 font-medium">Correo</th>
+                <th className="px-4 py-3 font-medium">Teléfono</th>
                 <th className="px-4 py-3 w-32" />
               </tr>
             </thead>
@@ -130,24 +130,24 @@ export default function Clients() {
 
       {modal && (
         <Modal
-          title={modal.id ? "Edit Client" : "New Client"}
+          title={modal.id ? "Editar Cliente" : "Nuevo Cliente"}
           onClose={() => setModal(null)}
         >
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Field
-              label="Name"
+              label="Nombre"
               value={modal.name}
               onChange={(v) => setModal((m) => ({ ...m, name: v }))}
               required
             />
             <Field
-              label="Email"
+              label="Correo"
               type="email"
               value={modal.email}
               onChange={(v) => setModal((m) => ({ ...m, email: v }))}
             />
             <Field
-              label="Phone"
+              label="Teléfono"
               value={modal.phone}
               onChange={(v) => setModal((m) => ({ ...m, phone: v }))}
             />
@@ -157,14 +157,14 @@ export default function Clients() {
                 onClick={() => setModal(null)}
                 className="px-4 py-2 text-sm text-(--muted) hover:text-(--text) transition-colors"
               >
-                Cancel
+                Cancelar
               </button>
               <button
                 type="submit"
                 disabled={saving}
                 className="px-4 py-2 bg-(--primary) text-(--text) text-sm font-medium rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity"
               >
-                {saving ? "Saving…" : modal.id ? "Save Changes" : "Create"}
+                {saving ? "Guardando…" : modal.id ? "Guardar Cambios" : "Crear"}
               </button>
             </div>
           </form>

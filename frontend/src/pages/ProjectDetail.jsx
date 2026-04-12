@@ -78,7 +78,7 @@ export default function ProjectDetail() {
   }
 
   async function handleDelete({ id: expenseId, name }) {
-    if (!window.confirm(`Delete "${name}"?`)) return;
+    if (!window.confirm(`¿Eliminar "${name}"?`)) return;
     try {
       await deleteProjectExpense(await getToken(), expenseId);
       setExpenses((prev) => prev.filter((e) => e.id !== expenseId));
@@ -91,7 +91,7 @@ export default function ProjectDetail() {
   const charge = totalExpenses * (1 + project?.win_margin / 100);
   const profit = charge - totalExpenses;
 
-  if (loading) return <p className="text-(--muted) text-sm">Loading…</p>;
+  if (loading) return <p className="text-(--muted) text-sm">Cargando…</p>;
   if (error) return <p className="text-(--danger) text-sm">{error}</p>;
 
   return (
@@ -102,7 +102,7 @@ export default function ProjectDetail() {
           to="/projects"
           className="text-xs text-(--muted) hover:text-(--text) transition-colors"
         >
-          ← Projects
+          ← Proyectos
         </Link>
         <h1 className="text-xl font-semibold text-(--text) mt-1">
           {project.name}
@@ -113,24 +113,24 @@ export default function ProjectDetail() {
       {/* Project info cards */}
       <div className="grid grid-cols-3 gap-4">
         <InfoCard
-          label="Total Expenses"
+          label="Total Gastos"
           value={`$${totalExpenses.toFixed(2)}`}
           valueClass="text-(--danger)"
         />
-        <InfoCard label="Win Margin" value={`${project.win_margin}%`} />
+        <InfoCard label="Margen de Ganancia" value={`${project.win_margin}%`} />
         <InfoCard
-          label="Profit"
+          label="Ganancia"
           value={`$${profit.toFixed(2)}`}
           valueClass="text-(--success)"
         />
         <InfoCard
-          label="Charge"
+          label="Cobro"
           value={`$${charge.toFixed(2)}`}
           valueClass="text-(--success)"
         />
         <InfoCard
-          label="Status"
-          value={project.invoiced ? "Invoiced" : "Pending"}
+          label="Facturado"
+          value={project.invoiced ? "Facturado" : "Pendiente"}
           valueClass={project.invoiced ? "text-(--success)" : "text-(--muted)"}
         />
       </div>
@@ -138,26 +138,26 @@ export default function ProjectDetail() {
       {/* Expenses section */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-(--text)">Expenses</h2>
+          <h2 className="text-base font-semibold text-(--text)">Gastos</h2>
           <button
             onClick={() => setModal(EMPTY)}
             className="px-4 py-2 bg-(--primary) text-white text-sm font-medium rounded-lg hover:opacity-90"
           >
-            + Add Expense
+            + Agregar Gasto
           </button>
         </div>
 
         {expenses.length === 0 ? (
-          <p className="text-(--muted) text-sm">No expenses yet.</p>
+          <p className="text-(--muted) text-sm">Sin gastos aún.</p>
         ) : (
           <div className="bg-(--surface) rounded-xl border border-(--border) overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-(--border) text-(--muted) text-left">
-                  <th className="px-4 py-3 font-medium">Name</th>
-                  <th className="px-4 py-3 font-medium">Description</th>
-                  <th className="px-4 py-3 font-medium">Amount</th>
-                  <th className="px-4 py-3 font-medium">Created</th>
+                  <th className="px-4 py-3 font-medium">Nombre</th>
+                  <th className="px-4 py-3 font-medium">Descripción</th>
+                  <th className="px-4 py-3 font-medium">Monto</th>
+                  <th className="px-4 py-3 font-medium">Creado</th>
                   <th className="px-4 py-3 w-32" />
                 </tr>
               </thead>
@@ -202,23 +202,23 @@ export default function ProjectDetail() {
 
       {modal && (
         <Modal
-          title={modal.id ? "Edit Expense" : "New Expense"}
+          title={modal.id ? "Editar Gasto" : "Nuevo Gasto"}
           onClose={() => setModal(null)}
         >
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Field
-              label="Name"
+              label="Nombre"
               value={modal.name}
               onChange={(v) => setModal((m) => ({ ...m, name: v }))}
               required
             />
             <Field
-              label="Description"
+              label="Descripción"
               value={modal.description}
               onChange={(v) => setModal((m) => ({ ...m, description: v }))}
             />
             <Field
-              label="Amount ($)"
+              label="Monto ($)"
               type="number"
               value={modal.amount}
               onChange={(v) => setModal((m) => ({ ...m, amount: v }))}
@@ -230,14 +230,18 @@ export default function ProjectDetail() {
                 onClick={() => setModal(null)}
                 className="px-4 py-2 text-sm text-(--muted) hover:text-(--text) transition-colors"
               >
-                Cancel
+                Cancelar
               </button>
               <button
                 type="submit"
                 disabled={saving}
                 className="px-4 py-2 bg-(--primary) text-white text-sm font-medium rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity"
               >
-                {saving ? "Saving…" : modal.id ? "Save Changes" : "Add"}
+                {saving
+                  ? "Guardando…"
+                  : modal.id
+                    ? "Guardar Cambios"
+                    : "Agregar"}
               </button>
             </div>
           </form>

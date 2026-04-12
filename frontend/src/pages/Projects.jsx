@@ -93,7 +93,7 @@ export default function Projects() {
   }
 
   async function handleDelete({ id, name }) {
-    if (!window.confirm(`Delete "${name}"?`)) return;
+    if (!window.confirm(`¿Eliminar "${name}"?`)) return;
     try {
       await deleteProject(await getToken(), id);
       setProjects((prev) => prev.filter((p) => p.id !== id));
@@ -105,16 +105,16 @@ export default function Projects() {
   return (
     <div>
       <PageHeader
-        title="Projects"
-        action="+ New Project"
+        title="Proyectos"
+        action="+ Nuevo Proyecto"
         onAction={() => setModal(EMPTY)}
       />
 
-      {loading && <p className="text-(--muted) text-sm">Loading…</p>}
+      {loading && <p className="text-(--muted) text-sm">Cargando…</p>}
       {error && <p className="text-(--danger) text-sm">{error}</p>}
       {!loading && !error && projects.length === 0 && (
         <p className="text-(--muted) text-sm">
-          No projects yet. Add your first one.
+          No hay proyectos aún. Agrega el primero.
         </p>
       )}
 
@@ -123,12 +123,12 @@ export default function Projects() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-(--border) text-(--muted) text-left">
-                <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">Client</th>
-                <th className="px-4 py-3 font-medium">Description</th>
-                <th className="px-4 py-3 font-medium">Charge</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 font-medium">Created</th>
+                <th className="px-4 py-3 font-medium">Nombre</th>
+                <th className="px-4 py-3 font-medium">Cliente</th>
+                <th className="px-4 py-3 font-medium">Descripción</th>
+                <th className="px-4 py-3 font-medium">Cobro</th>
+                <th className="px-4 py-3 font-medium">Facturado</th>
+                <th className="px-4 py-3 font-medium">Creado</th>
                 <th className="px-4 py-3 w-32" />
               </tr>
             </thead>
@@ -159,7 +159,7 @@ export default function Projects() {
                     <span
                       className={`text-xs font-medium px-2 py-0.5 rounded-full ${p.invoiced ? "bg-green-900/40 text-(--success)" : "bg-(--background) text-(--muted)"}`}
                     >
-                      {p.invoiced ? "Invoiced" : "Pending"}
+                      {p.invoiced ? "Facturado" : "Pendiente"}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-(--muted)">
@@ -189,24 +189,24 @@ export default function Projects() {
 
       {modal && (
         <Modal
-          title={modal.id ? "Edit Project" : "New Project"}
+          title={modal.id ? "Editar Proyecto" : "Nuevo Proyecto"}
           onClose={() => setModal(null)}
         >
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Field
-              label="Name"
+              label="Nombre"
               value={modal.name}
               onChange={(v) => setModal((m) => ({ ...m, name: v }))}
               required
             />
             <Field
-              label="Description"
+              label="Descripción"
               value={modal.description}
               onChange={(v) => setModal((m) => ({ ...m, description: v }))}
             />
             <label className="flex flex-col gap-1">
               <span className="text-xs font-medium text-(--muted) uppercase tracking-wide">
-                Client
+                Cliente
               </span>
               <select
                 required
@@ -216,7 +216,7 @@ export default function Projects() {
                 }
                 className="bg-(--background) border border-(--border) rounded-lg px-3 py-2 text-sm text-(--text) focus:outline-none focus:border-(--primary) transition-colors"
               >
-                <option value="">Select a client…</option>
+                <option value="">Selecciona un cliente…</option>
                 {clients.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -225,7 +225,7 @@ export default function Projects() {
               </select>
             </label>
             <Field
-              label="Win Margin (%)"
+              label="Margen de Ganancia (%)"
               type="number"
               value={modal.win_margin}
               onChange={(v) => setModal((m) => ({ ...m, win_margin: v }))}
@@ -240,7 +240,7 @@ export default function Projects() {
                 }
                 className="w-4 h-4 accent-(--primary)"
               />
-              <span className="text-sm text-(--text)">Invoiced</span>
+              <span className="text-sm text-(--text)">Facturado</span>
             </label>
             <div className="flex gap-3 justify-end pt-2">
               <button
@@ -248,14 +248,14 @@ export default function Projects() {
                 onClick={() => setModal(null)}
                 className="px-4 py-2 text-sm text-(--muted) hover:text-(--text) transition-colors"
               >
-                Cancel
+                Cancelar
               </button>
               <button
                 type="submit"
                 disabled={saving}
                 className="px-4 py-2 bg-(--primary) text-white text-sm font-medium rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity"
               >
-                {saving ? "Saving…" : modal.id ? "Save Changes" : "Create"}
+                {saving ? "Guardando…" : modal.id ? "Guardar Cambios" : "Crear"}
               </button>
             </div>
           </form>
