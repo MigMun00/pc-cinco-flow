@@ -16,6 +16,7 @@ class Project(Base):
     description: Mapped[str] = mapped_column(String, nullable=True)
 
     win_margin: Mapped[float] = mapped_column(Float, nullable=False)
+    custom_fee: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     invoiced: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))

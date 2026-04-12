@@ -88,7 +88,8 @@ export default function ProjectDetail() {
   }
 
   const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
-  const charge = totalExpenses * (1 + project?.win_margin / 100);
+  const baseCharge = totalExpenses * (1 + project?.win_margin / 100);
+  const charge = baseCharge + (project?.custom_fee ?? 0);
   const profit = charge - totalExpenses;
 
   if (loading) return <p className="text-(--muted) text-sm">Cargando…</p>;
@@ -121,6 +122,11 @@ export default function ProjectDetail() {
         <InfoCard
           label="Ganancia"
           value={`$${profit.toFixed(2)}`}
+          valueClass="text-(--success)"
+        />
+        <InfoCard
+          label="Cargo Adicional"
+          value={`$${(project.custom_fee ?? 0).toFixed(2)}`}
           valueClass="text-(--success)"
         />
         <InfoCard

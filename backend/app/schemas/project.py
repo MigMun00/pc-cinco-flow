@@ -8,6 +8,7 @@ class ProjectBase(BaseModel):
     name: str
     description: Optional[str] = None
     win_margin: float
+    custom_fee: float = 0.0
     invoiced: bool = False
 
 
@@ -20,6 +21,7 @@ class ProjectUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     win_margin: Optional[float] = None
+    custom_fee: Optional[float] = None
     invoiced: Optional[bool] = None
 
 

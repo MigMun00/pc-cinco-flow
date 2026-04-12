@@ -20,6 +20,7 @@ const EMPTY = {
   description: "",
   client_id: "",
   win_margin: "",
+  custom_fee: "",
   invoiced: false,
 };
 
@@ -65,7 +66,7 @@ export default function Projects() {
     const total = expenses
       .filter((e) => e.project_id === p.id)
       .reduce((sum, e) => sum + e.amount, 0);
-    return total * (1 + p.win_margin / 100);
+    return total * (1 + p.win_margin / 100) + (p.custom_fee ?? 0);
   }
 
   async function handleSubmit(e) {
@@ -78,6 +79,7 @@ export default function Projects() {
         ...fields,
         client_id: Number(fields.client_id),
         win_margin: parseFloat(fields.win_margin),
+        custom_fee: parseFloat(fields.custom_fee) || 0,
         description: fields.description || null,
       };
       id
@@ -174,6 +176,7 @@ export default function Projects() {
                           description: p.description ?? "",
                           client_id: p.client_id,
                           win_margin: p.win_margin,
+                          custom_fee: p.custom_fee ?? 0,
                           invoiced: p.invoiced,
                         })
                       }
@@ -230,6 +233,12 @@ export default function Projects() {
               value={modal.win_margin}
               onChange={(v) => setModal((m) => ({ ...m, win_margin: v }))}
               required
+            />
+            <Field
+              label="Cargo Adicional ($)"
+              type="number"
+              value={modal.custom_fee}
+              onChange={(v) => setModal((m) => ({ ...m, custom_fee: v }))}
             />
             <label className="flex items-center gap-2 cursor-pointer">
               <input
