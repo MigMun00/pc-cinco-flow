@@ -9,9 +9,6 @@ function ClientBar({ client }) {
     <div className="rounded-xl border border-(--border) p-3">
       <div className="mb-2 flex items-center justify-between gap-2">
         <p className="text-sm font-medium text-(--text)">{client.name}</p>
-        <p className="text-sm font-semibold text-(--warning)">
-          Pendiente: {money.format(client.totalPending)}
-        </p>
       </div>
 
       <div className="flex h-2 overflow-hidden rounded-full bg-slate-700/60">

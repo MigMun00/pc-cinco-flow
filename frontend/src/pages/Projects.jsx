@@ -139,7 +139,7 @@ export default function Projects() {
     },
     {
       key: "invoiced",
-      header: "Facturado",
+      header: "Facturación",
       render: (project) => <InvoicedBadge invoiced={project.invoiced} />,
     },
     {

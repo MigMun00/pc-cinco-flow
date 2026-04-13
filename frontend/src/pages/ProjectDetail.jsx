@@ -135,7 +135,7 @@ export default function ProjectDetail() {
           valueClass="text-(--success)"
         />
         <InfoCard
-          label="Facturado"
+          label="Facturación"
           value={project.invoiced ? "Facturado" : "Pendiente"}
           valueClass={project.invoiced ? "text-(--success)" : "text-(--muted)"}
         />

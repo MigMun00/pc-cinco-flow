@@ -133,7 +133,7 @@ export default function Services() {
     },
     {
       key: "invoiced",
-      header: "Facturado",
+      header: "Facturación",
       render: (service) => <InvoicedBadge invoiced={service.invoiced} />,
     },
     {
