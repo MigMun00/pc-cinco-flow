@@ -1,5 +1,11 @@
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+export const money = new Intl.NumberFormat("es-MX", {
+  style: "currency",
+  currency: "MXN",
+  maximumFractionDigits: 2,
+});
+
 export async function apiFetch(path, token, options = {}) {
   const res = await fetch(`${BASE_URL}${path}`, {
     ...options,
