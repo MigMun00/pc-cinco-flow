@@ -155,7 +155,7 @@ export default function Services() {
         loading={loading}
         error={error}
         isEmpty={!loading && !error && services.length === 0}
-        emptyMessage="No hay servicios aun. Agrega el primero."
+        emptyMessage="No hay servicios aún. Agrega el primero."
       />
 
       {!loading && !error && services.length > 0 && (

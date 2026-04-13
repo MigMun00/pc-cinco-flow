@@ -161,7 +161,7 @@ export default function Projects() {
         loading={loading}
         error={error}
         isEmpty={!loading && !error && projects.length === 0}
-        emptyMessage="No hay proyectos aun. Agrega el primero."
+        emptyMessage="No hay proyectos aún. Agrega el primero."
       />
 
       {!loading && !error && projects.length > 0 && (

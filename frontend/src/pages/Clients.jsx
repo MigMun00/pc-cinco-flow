@@ -102,7 +102,7 @@ export default function Clients() {
         loading={loading}
         error={error}
         isEmpty={!loading && !error && clients.length === 0}
-        emptyMessage="No hay clientes aun. Agrega el primero."
+        emptyMessage="No hay clientes aún. Agrega el primero."
       />
 
       {!loading && !error && clients.length > 0 && (
