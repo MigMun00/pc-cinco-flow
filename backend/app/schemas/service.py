@@ -7,12 +7,12 @@ class ServiceBase(BaseModel):
     client_id: int
     name: str
     description: Optional[str] = None
-    amount: float
     invoiced: bool = False
+    product_id: Optional[int] = None
 
 
 class ServiceCreate(ServiceBase):
-    pass
+    amount: Optional[float] = None
 
 
 class ServiceUpdate(BaseModel):
@@ -21,11 +21,13 @@ class ServiceUpdate(BaseModel):
     description: Optional[str] = None
     amount: Optional[float] = None
     invoiced: Optional[bool] = None
+    product_id: Optional[int] = None
 
 
 class ServiceRead(ServiceBase):
     id: int
     user_id: str
+    amount: float
     created_at: datetime
 
     model_config = {"from_attributes": True}

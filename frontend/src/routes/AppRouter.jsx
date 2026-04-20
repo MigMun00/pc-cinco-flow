@@ -4,6 +4,7 @@ import { useUser } from "@clerk/react";
 import MainLayout from "../layouts/MainLayout";
 import Dashboard from "../pages/Dashboard";
 import Clients from "../pages/Clients";
+import Products from "../pages/Products";
 import Projects from "../pages/Projects";
 import ProjectDetail from "../pages/ProjectDetail";
 import Services from "../pages/Services";
@@ -38,6 +39,7 @@ export default function AppRouter() {
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/:id" element={<ProjectDetail />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/products" element={<Products />} />
         </Route>
       </Routes>
     </BrowserRouter>

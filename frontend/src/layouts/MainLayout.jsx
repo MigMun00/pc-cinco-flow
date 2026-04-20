@@ -17,6 +17,7 @@ export default function MainLayout() {
           <NavItem to="/clients" label="Clientes" />
           <NavItem to="/projects" label="Proyectos" />
           <NavItem to="/services" label="Servicios" />
+          <NavItem to="/products" label="Productos" />
         </nav>
 
         {/* User section */}

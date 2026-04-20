@@ -3,10 +3,18 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.core.deps import get_db, get_current_user
+from app.models.product import Product
 from app.models.service import Service
 from app.schemas.service import ServiceCreate, ServiceUpdate, ServiceRead
 
 router = APIRouter(prefix="/services", tags=["services"])
+
+
+def resolve_product_price(db: Session, user_id: str, product_id: int) -> float:
+    product = db.query(Product).filter(Product.id == product_id, Product.user_id == user_id).first()
+    if not product:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
+    return product.price
 
 
 @router.get("/", response_model=List[ServiceRead])
@@ -23,7 +31,17 @@ def create_service(
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user),
 ):
-    service = Service(**payload.model_dump(), user_id=user_id)
+    service_data = payload.model_dump()
+
+    if payload.product_id is not None:
+        service_data["amount"] = resolve_product_price(db, user_id, payload.product_id)
+    elif payload.amount is None:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Amount is required when no product is selected",
+        )
+
+    service = Service(**service_data, user_id=user_id)
     db.add(service)
     try:
         db.commit()
@@ -44,7 +62,14 @@ def update_service(
     service = db.query(Service).filter(Service.id == service_id, Service.user_id == user_id).first()
     if not service:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
-    for field, value in payload.model_dump(exclude_unset=True).items():
+
+    update_data = payload.model_dump(exclude_unset=True)
+    resolved_product_id = update_data.get("product_id", service.product_id)
+
+    if resolved_product_id is not None:
+        update_data["amount"] = resolve_product_price(db, user_id, resolved_product_id)
+
+    for field, value in update_data.items():
         setattr(service, field, value)
     try:
         db.commit()

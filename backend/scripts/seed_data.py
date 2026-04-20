@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
 from app.models.client import Client
+from app.models.product import Product
 from app.models.project import Project
 from app.models.project_expense import ProjectExpense
 from app.models.service import Service
@@ -148,38 +149,47 @@ SERVICIOS = [
     {
         "client_name": "Panaderia La Espiga",
         "name": "Limpieza mensual de equipos",
+        "product_name": "Mantenimiento Preventivo",
         "description": "Limpieza preventiva de 6 computadoras de caja y administracion.",
-        "amount": 95.0,
         "invoiced": True,
     },
     {
         "client_name": "Hotel Mirador Andino",
         "name": "Soporte remoto de conectividad",
+        "product_name": "Soporte Remoto",
         "description": "Monitoreo y soporte remoto para incidencias de internet y red wifi.",
-        "amount": 120.0,
         "invoiced": False,
     },
     {
         "client_name": "Clinica Santa Teresa",
         "name": "Instalacion de antivirus en recepcion",
+        "product_name": "Instalacion de Antivirus",
         "description": "Instalacion y configuracion de politicas de escaneo en 4 equipos.",
-        "amount": 140.0,
         "invoiced": True,
     },
     {
         "client_name": "Ferreteria El Tornillo",
         "name": "Reparacion de computadora de inventario",
+        "product_name": "Reparacion de PC",
         "description": "Cambio de fuente de poder, limpieza y recuperacion de sistema.",
-        "amount": 180.0,
         "invoiced": False,
     },
     {
         "client_name": "Unidad Educativa Nuevo Horizonte",
         "name": "Configuracion de router y VLAN",
+        "product_name": "Configuracion de Red",
         "description": "Segmentacion de trafico para docentes, administrativos y estudiantes.",
-        "amount": 260.0,
         "invoiced": False,
     },
+]
+
+
+PRODUCTOS = [
+    {"name": "Mantenimiento Preventivo", "price": 95.0},
+    {"name": "Soporte Remoto", "price": 120.0},
+    {"name": "Instalacion de Antivirus", "price": 140.0},
+    {"name": "Reparacion de PC", "price": 180.0},
+    {"name": "Configuracion de Red", "price": 260.0},
 ]
 
 
@@ -188,6 +198,7 @@ def purge_user_data(db: Session, user_id: str) -> None:
     db.query(ProjectExpense).filter(ProjectExpense.user_id == user_id).delete(synchronize_session=False)
     db.query(Project).filter(Project.user_id == user_id).delete(synchronize_session=False)
     db.query(Service).filter(Service.user_id == user_id).delete(synchronize_session=False)
+    db.query(Product).filter(Product.user_id == user_id).delete(synchronize_session=False)
     db.query(Client).filter(Client.user_id == user_id).delete(synchronize_session=False)
 
 
@@ -203,6 +214,15 @@ def seed(db: Session, user_id: str, clear_existing: bool) -> dict[str, int]:
     db.add_all(client_records)
     db.flush()
     client_ids = {client.name: client.id for client in client_records}
+
+    product_records: list[Product] = []
+    for item in PRODUCTOS:
+        product = Product(user_id=user_id, **item)
+        product_records.append(product)
+
+    db.add_all(product_records)
+    db.flush()
+    product_map = {product.name: product for product in product_records}
 
     project_records: list[Project] = []
     for item in PROYECTOS:
@@ -226,7 +246,11 @@ def seed(db: Session, user_id: str, clear_existing: bool) -> dict[str, int]:
     for item in SERVICIOS:
         payload = item.copy()
         client_name = payload.pop("client_name")
+        product_name = payload.pop("product_name")
+        product = product_map[product_name]
+        payload["amount"] = product.price
         service = Service(user_id=user_id, client_id=client_ids[client_name], **payload)
+        service.product_id = product.id
         service_records.append(service)
 
     db.add_all(expense_records)
@@ -235,6 +259,7 @@ def seed(db: Session, user_id: str, clear_existing: bool) -> dict[str, int]:
 
     return {
         "clients": len(client_records),
+        "products": len(product_records),
         "projects": len(project_records),
         "project_expenses": len(expense_records),
         "services": len(service_records),
@@ -270,6 +295,7 @@ def main() -> None:
     print("Seed completado correctamente.")
     print(f"Usuario: {args.user_id}")
     print(f"Clientes: {summary['clients']}")
+    print(f"Productos: {summary['products']}")
     print(f"Proyectos: {summary['projects']}")
     print(f"Gastos de proyecto: {summary['project_expenses']}")
     print(f"Servicios: {summary['services']}")

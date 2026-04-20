@@ -7,7 +7,8 @@ import {
   deleteService,
 } from "../services/service";
 import { getClients } from "../services/client";
-import { fmtDate } from "../services/api";
+import { getProducts } from "../services/product";
+import { fmtDate, money } from "../services/api";
 import Field from "../components/Field";
 import PageHeader from "../components/PageHeader";
 import CrudState from "../components/CrudState";
@@ -15,12 +16,14 @@ import CrudTable from "../components/CrudTable";
 import CrudFormModal from "../components/CrudFormModal";
 import ClientSelectField from "../components/ClientSelectField";
 import InvoicedBadge from "../components/InvoicedBadge";
+import ProductSelectField from "../components/ProductSelectField";
 
 const EMPTY_SERVICE = {
   name: "",
   description: "",
   client_id: "",
   amount: "",
+  product_id: "",
   invoiced: false,
 };
 
@@ -28,6 +31,7 @@ export default function Services() {
   const { getToken } = useAuth();
   const [services, setServices] = useState([]);
   const [clients, setClients] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [modal, setModal] = useState(null);
@@ -38,12 +42,14 @@ export default function Services() {
       setLoading(true);
       setError(null);
       const token = await getToken();
-      const [servicesData, clientsData] = await Promise.all([
+      const [servicesData, clientsData, productsData] = await Promise.all([
         getServices(token),
         getClients(token),
+        getProducts(token),
       ]);
       setServices(servicesData);
       setClients(clientsData);
+      setProducts(productsData);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -59,6 +65,20 @@ export default function Services() {
     return clients.find((client) => client.id === clientId)?.name ?? "—";
   }
 
+  function getProduct(productId) {
+    return products.find((product) => product.id === productId) ?? null;
+  }
+
+  function handleProductChange(productId) {
+    const nextProduct = getProduct(Number(productId));
+
+    setModal((current) => ({
+      ...current,
+      product_id: productId,
+      amount: nextProduct ? nextProduct.price : current.amount,
+    }));
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
     setSaving(true);
@@ -68,6 +88,10 @@ export default function Services() {
       const { id, ...fields } = modal;
       const amount = parseFloat(fields.amount);
 
+      if (!fields.product_id) {
+        throw new Error("Selecciona un producto para el servicio.");
+      }
+
       if (Number.isNaN(amount)) {
         throw new Error("El monto debe ser un numero valido.");
       }
@@ -75,6 +99,7 @@ export default function Services() {
       const payload = {
         ...fields,
         client_id: Number(fields.client_id),
+        product_id: Number(fields.product_id),
         amount,
         description: fields.description || null,
       };
@@ -121,6 +146,11 @@ export default function Services() {
       render: (service) => getClientName(service.client_id),
     },
     {
+      key: "product",
+      header: "Producto",
+      render: (service) => getProduct(service.product_id)?.name ?? "—",
+    },
+    {
       key: "description",
       header: "Descripcion",
       cellClassName: "text-(--muted) max-w-xs truncate",
@@ -129,7 +159,7 @@ export default function Services() {
     {
       key: "amount",
       header: "Monto",
-      render: (service) => `$${service.amount.toFixed(2)}`,
+      render: (service) => money.format(service.amount),
     },
     {
       key: "invoiced",
@@ -169,6 +199,7 @@ export default function Services() {
               name: service.name,
               description: service.description ?? "",
               client_id: service.client_id,
+              product_id: service.product_id ?? "",
               amount: service.amount,
               invoiced: service.invoiced,
             })
@@ -203,11 +234,19 @@ export default function Services() {
             clients={clients}
             onChange={(value) => setModal((m) => ({ ...m, client_id: value }))}
           />
+          <ProductSelectField
+            value={modal.product_id}
+            products={products}
+            onChange={handleProductChange}
+          />
           <Field
             label="Monto ($)"
             type="number"
             value={modal.amount}
             onChange={(value) => setModal((m) => ({ ...m, amount: value }))}
+            disabled
+            min="0"
+            step="0.01"
             required
           />
           <label className="flex items-center gap-2 cursor-pointer">
