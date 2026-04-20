@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@clerk/react";
 import {
@@ -37,7 +37,7 @@ export default function Projects() {
   const [modal, setModal] = useState(null); // null | { id?, ...fields }
   const [saving, setSaving] = useState(false);
 
-  async function load() {
+  const load = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -55,11 +55,11 @@ export default function Projects() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [getToken]);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
   function clientName(id) {
     return clients.find((c) => c.id === id)?.name ?? "—";
@@ -149,6 +149,9 @@ export default function Projects() {
     },
   ];
 
+  const pendingProjects = projects.filter((project) => !project.invoiced);
+  const invoicedProjects = projects.filter((project) => project.invoiced);
+
   return (
     <div>
       <PageHeader
@@ -165,23 +168,71 @@ export default function Projects() {
       />
 
       {!loading && !error && projects.length > 0 && (
-        <CrudTable
-          rows={projects}
-          columns={columns}
-          getRowKey={(project) => project.id}
-          onEdit={(project) =>
-            setModal({
-              id: project.id,
-              name: project.name,
-              description: project.description ?? "",
-              client_id: project.client_id,
-              win_margin: project.win_margin,
-              custom_fee: project.custom_fee ?? 0,
-              invoiced: project.invoiced,
-            })
-          }
-          onDelete={handleDelete}
-        />
+        <div className="space-y-8">
+          <section className="space-y-3">
+            <div>
+              <h2 className="text-lg font-semibold text-(--text)">
+                Pendientes por facturar
+              </h2>
+            </div>
+
+            {pendingProjects.length > 0 ? (
+              <CrudTable
+                rows={pendingProjects}
+                columns={columns}
+                getRowKey={(project) => project.id}
+                onEdit={(project) =>
+                  setModal({
+                    id: project.id,
+                    name: project.name,
+                    description: project.description ?? "",
+                    client_id: project.client_id,
+                    win_margin: project.win_margin,
+                    custom_fee: project.custom_fee ?? 0,
+                    invoiced: project.invoiced,
+                  })
+                }
+                onDelete={handleDelete}
+              />
+            ) : (
+              <p className="text-sm text-(--muted)">
+                No hay proyectos pendientes por facturar.
+              </p>
+            )}
+          </section>
+
+          <section className="space-y-3">
+            <div>
+              <h2 className="text-lg font-semibold text-(--text)">
+                Historial facturado
+              </h2>
+            </div>
+
+            {invoicedProjects.length > 0 ? (
+              <CrudTable
+                rows={invoicedProjects}
+                columns={columns}
+                getRowKey={(project) => project.id}
+                onEdit={(project) =>
+                  setModal({
+                    id: project.id,
+                    name: project.name,
+                    description: project.description ?? "",
+                    client_id: project.client_id,
+                    win_margin: project.win_margin,
+                    custom_fee: project.custom_fee ?? 0,
+                    invoiced: project.invoiced,
+                  })
+                }
+                onDelete={handleDelete}
+              />
+            ) : (
+              <p className="text-sm text-(--muted)">
+                Aún no hay proyectos facturados en el historial.
+              </p>
+            )}
+          </section>
+        </div>
       )}
 
       {modal && (

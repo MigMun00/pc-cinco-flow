@@ -14,7 +14,12 @@ def get_projects(
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user),
 ):
-    return db.query(Project).filter(Project.user_id == user_id).all()
+    return (
+        db.query(Project)
+        .filter(Project.user_id == user_id)
+        .order_by(Project.invoiced.asc(), Project.created_at.desc())
+        .all()
+    )
 
 
 @router.post("/", response_model=ProjectRead, status_code=status.HTTP_201_CREATED)

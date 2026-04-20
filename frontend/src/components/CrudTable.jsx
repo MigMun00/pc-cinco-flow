@@ -57,7 +57,7 @@ export default function CrudTable({
       </div>
 
       <div className="hidden overflow-x-auto md:block">
-        <table className="w-full min-w-[720px] text-sm">
+        <table className="w-full min-w-180 text-sm">
           <thead>
             <tr className="border-b border-(--border) text-left text-(--muted)">
               {columns.map((column) => (

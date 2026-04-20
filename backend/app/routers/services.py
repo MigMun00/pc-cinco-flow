@@ -22,7 +22,12 @@ def get_services(
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user),
 ):
-    return db.query(Service).filter(Service.user_id == user_id).all()
+    return (
+        db.query(Service)
+        .filter(Service.user_id == user_id)
+        .order_by(Service.invoiced.asc(), Service.created_at.desc())
+        .all()
+    )
 
 
 @router.post("/", response_model=ServiceRead, status_code=status.HTTP_201_CREATED)

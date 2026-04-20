@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@clerk/react";
 import {
   getServices,
@@ -37,7 +37,7 @@ export default function Services() {
   const [modal, setModal] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  async function load() {
+  const load = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -55,11 +55,11 @@ export default function Services() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [getToken]);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
   function getClientName(clientId) {
     return clients.find((client) => client.id === clientId)?.name ?? "—";
@@ -173,6 +173,9 @@ export default function Services() {
     },
   ];
 
+  const pendingServices = services.filter((service) => !service.invoiced);
+  const invoicedServices = services.filter((service) => service.invoiced);
+
   return (
     <div>
       <PageHeader
@@ -189,23 +192,71 @@ export default function Services() {
       />
 
       {!loading && !error && services.length > 0 && (
-        <CrudTable
-          rows={services}
-          columns={columns}
-          getRowKey={(service) => service.id}
-          onEdit={(service) =>
-            setModal({
-              id: service.id,
-              name: service.name,
-              description: service.description ?? "",
-              client_id: service.client_id,
-              product_id: service.product_id ?? "",
-              amount: service.amount,
-              invoiced: service.invoiced,
-            })
-          }
-          onDelete={handleDelete}
-        />
+        <div className="space-y-8">
+          <section className="space-y-3">
+            <div>
+              <h2 className="text-lg font-semibold text-(--text)">
+                Pendientes por facturar
+              </h2>
+            </div>
+
+            {pendingServices.length > 0 ? (
+              <CrudTable
+                rows={pendingServices}
+                columns={columns}
+                getRowKey={(service) => service.id}
+                onEdit={(service) =>
+                  setModal({
+                    id: service.id,
+                    name: service.name,
+                    description: service.description ?? "",
+                    client_id: service.client_id,
+                    product_id: service.product_id ?? "",
+                    amount: service.amount,
+                    invoiced: service.invoiced,
+                  })
+                }
+                onDelete={handleDelete}
+              />
+            ) : (
+              <p className="text-sm text-(--muted)">
+                No hay servicios pendientes por facturar.
+              </p>
+            )}
+          </section>
+
+          <section className="space-y-3">
+            <div>
+              <h2 className="text-lg font-semibold text-(--text)">
+                Historial facturado
+              </h2>
+            </div>
+
+            {invoicedServices.length > 0 ? (
+              <CrudTable
+                rows={invoicedServices}
+                columns={columns}
+                getRowKey={(service) => service.id}
+                onEdit={(service) =>
+                  setModal({
+                    id: service.id,
+                    name: service.name,
+                    description: service.description ?? "",
+                    client_id: service.client_id,
+                    product_id: service.product_id ?? "",
+                    amount: service.amount,
+                    invoiced: service.invoiced,
+                  })
+                }
+                onDelete={handleDelete}
+              />
+            ) : (
+              <p className="text-sm text-(--muted)">
+                Aún no hay servicios facturados en el historial.
+              </p>
+            )}
+          </section>
+        </div>
       )}
 
       {modal && (
