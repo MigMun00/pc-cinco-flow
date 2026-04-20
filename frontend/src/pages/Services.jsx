@@ -32,6 +32,7 @@ export default function Services() {
   const [services, setServices] = useState([]);
   const [clients, setClients] = useState([]);
   const [products, setProducts] = useState([]);
+  const [clientFilter, setClientFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [modal, setModal] = useState(null);
@@ -173,8 +174,15 @@ export default function Services() {
     },
   ];
 
-  const pendingServices = services.filter((service) => !service.invoiced);
-  const invoicedServices = services.filter((service) => service.invoiced);
+  const filteredServices = services.filter(
+    (service) => !clientFilter || String(service.client_id) === clientFilter,
+  );
+  const pendingServices = filteredServices.filter(
+    (service) => !service.invoiced,
+  );
+  const invoicedServices = filteredServices.filter(
+    (service) => service.invoiced,
+  );
 
   return (
     <div>
@@ -183,6 +191,17 @@ export default function Services() {
         action="+ Nuevo Servicio"
         onAction={() => setModal(EMPTY_SERVICE)}
       />
+
+      <div className="mb-6 max-w-sm">
+        <ClientSelectField
+          value={clientFilter}
+          clients={clients}
+          onChange={setClientFilter}
+          required={false}
+          label="Filtrar por cliente"
+          placeholder="Todos los clientes"
+        />
+      </div>
 
       <CrudState
         loading={loading}
@@ -193,6 +212,12 @@ export default function Services() {
 
       {!loading && !error && services.length > 0 && (
         <div className="space-y-8">
+          {filteredServices.length === 0 && (
+            <p className="text-sm text-(--muted)">
+              No hay servicios para el cliente seleccionado.
+            </p>
+          )}
+
           <section className="space-y-3">
             <div>
               <h2 className="text-lg font-semibold text-(--text)">

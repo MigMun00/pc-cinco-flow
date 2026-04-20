@@ -32,6 +32,7 @@ export default function Projects() {
   const [projects, setProjects] = useState([]);
   const [clients, setClients] = useState([]);
   const [expenses, setExpenses] = useState([]);
+  const [clientFilter, setClientFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [modal, setModal] = useState(null); // null | { id?, ...fields }
@@ -149,8 +150,15 @@ export default function Projects() {
     },
   ];
 
-  const pendingProjects = projects.filter((project) => !project.invoiced);
-  const invoicedProjects = projects.filter((project) => project.invoiced);
+  const filteredProjects = projects.filter(
+    (project) => !clientFilter || String(project.client_id) === clientFilter,
+  );
+  const pendingProjects = filteredProjects.filter(
+    (project) => !project.invoiced,
+  );
+  const invoicedProjects = filteredProjects.filter(
+    (project) => project.invoiced,
+  );
 
   return (
     <div>
@@ -159,6 +167,17 @@ export default function Projects() {
         action="+ Nuevo Proyecto"
         onAction={() => setModal(EMPTY)}
       />
+
+      <div className="mb-6 max-w-sm">
+        <ClientSelectField
+          value={clientFilter}
+          clients={clients}
+          onChange={setClientFilter}
+          required={false}
+          label="Filtrar por cliente"
+          placeholder="Todos los clientes"
+        />
+      </div>
 
       <CrudState
         loading={loading}
@@ -169,6 +188,12 @@ export default function Projects() {
 
       {!loading && !error && projects.length > 0 && (
         <div className="space-y-8">
+          {filteredProjects.length === 0 && (
+            <p className="text-sm text-(--muted)">
+              No hay proyectos para el cliente seleccionado.
+            </p>
+          )}
+
           <section className="space-y-3">
             <div>
               <h2 className="text-lg font-semibold text-(--text)">
