@@ -5,7 +5,7 @@ export default function RowActions({
 }) {
   return (
     <div
-      className={`flex flex-wrap gap-2 ${
+      className={`flex gap-2 ${
         mobileAlignLeft ? "justify-start" : "justify-end"
       }`}
     >
