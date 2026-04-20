@@ -41,7 +41,9 @@ export default function MainLayout() {
           <SidebarContent user={user} onNavigate={closeMenu} />
         </aside>
 
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(92,115,184,0.35),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(34,197,94,0.18),transparent_28%)]" />
+
           <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-(--border) bg-(--background)/95 px-4 py-3 backdrop-blur md:hidden">
             <button
               type="button"
@@ -63,7 +65,7 @@ export default function MainLayout() {
             </div>
           </header>
 
-          <main className="flex-1 overflow-auto px-4 py-4 sm:px-6 sm:py-6">
+          <main className="relative z-10 flex-1 overflow-auto px-4 py-4 sm:px-6 sm:py-6">
             <div className="mx-auto flex w-full flex-col gap-6">
               <Outlet />
             </div>
