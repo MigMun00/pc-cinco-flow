@@ -26,7 +26,7 @@ function ClientBar({ client }) {
         )}
       </div>
 
-      <div className="mt-2 flex justify-between text-xs">
+      <div className="mt-2 flex flex-col gap-1 text-xs sm:flex-row sm:justify-between">
         <span className="text-(--success)">
           Facturado: {money.format(client.totalInvoiced)}
         </span>
@@ -41,7 +41,7 @@ function ClientBar({ client }) {
 export default function TopClientes({ clients }) {
   return (
     <div className="rounded-2xl border border-(--border) bg-(--surface) p-5">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between gap-3">
         <h2 className="text-base font-semibold text-(--text)">
           Facturación Clientes
         </h2>

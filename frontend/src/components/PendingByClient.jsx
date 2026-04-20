@@ -4,7 +4,7 @@ import { money } from "../services/api";
 function PendingList({ title, items, to }) {
   return (
     <div className="rounded-lg border border-(--border) bg-slate-800/40 p-3">
-      <div className="mb-2 flex items-center justify-between">
+      <div className="mb-2 flex items-center justify-between gap-2">
         <p className="text-xs uppercase tracking-wide text-(--muted)">
           {title}
         </p>
@@ -18,7 +18,7 @@ function PendingList({ title, items, to }) {
           {items.map((item) => (
             <li
               key={item.id}
-              className="flex items-center justify-between text-sm"
+              className="flex items-start justify-between gap-3 text-sm"
             >
               <span className="truncate pr-3 text-(--text)">{item.name}</span>
               <span className="font-medium text-(--warning)">
@@ -42,7 +42,7 @@ function PendingList({ title, items, to }) {
 export default function PendingByClient({ clients }) {
   return (
     <section className="rounded-2xl border border-(--border) bg-(--surface) p-5">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between gap-3">
         <h2 className="text-base font-semibold text-(--text)">
           Pendientes por Cliente
         </h2>
@@ -57,7 +57,7 @@ export default function PendingByClient({ clients }) {
               key={client.id}
               className="rounded-xl border border-(--border) p-4"
             >
-              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <h3 className="text-sm font-semibold text-(--text)">
                   {client.name}
                 </h3>

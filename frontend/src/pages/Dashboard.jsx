@@ -16,7 +16,7 @@ export default function Dashboard() {
         <p className="text-xs uppercase tracking-[0.18em] text-(--muted)">
           Resumen financiero
         </p>
-        <h1 className="mt-2 text-2xl font-semibold text-(--text)">
+        <h1 className="mt-2 text-2xl font-semibold text-(--text) sm:text-3xl">
           Dashboard de Clientes e Ingresos
         </h1>
       </header>

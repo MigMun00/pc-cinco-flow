@@ -1,18 +1,30 @@
-export default function RowActions({ onEdit, onDelete }) {
+export default function RowActions({
+  onEdit,
+  onDelete,
+  mobileAlignLeft = false,
+}) {
   return (
-    <div className="flex gap-2 justify-end">
-      <button
-        onClick={onEdit}
-        className="px-3 py-1 text-xs rounded-md bg-(--background) text-(--muted) hover:text-(--text) border border-(--border) transition-colors"
-      >
-        Editar
-      </button>
-      <button
-        onClick={onDelete}
-        className="px-3 py-1 text-xs rounded-md text-(--danger) hover:bg-(--danger) hover:text-(--text) border border-(--danger) transition-colors"
-      >
-        Eliminar
-      </button>
+    <div
+      className={`flex flex-wrap gap-2 ${
+        mobileAlignLeft ? "justify-start" : "justify-end"
+      }`}
+    >
+      {onEdit && (
+        <button
+          onClick={onEdit}
+          className="rounded-md border border-(--border) bg-(--background) px-3 py-2 text-xs text-(--muted) transition-colors hover:text-(--text)"
+        >
+          Editar
+        </button>
+      )}
+      {onDelete && (
+        <button
+          onClick={onDelete}
+          className="rounded-md border border-(--danger) px-3 py-2 text-xs text-(--danger) transition-colors hover:bg-(--danger) hover:text-(--text)"
+        >
+          Eliminar
+        </button>
+      )}
     </div>
   );
 }

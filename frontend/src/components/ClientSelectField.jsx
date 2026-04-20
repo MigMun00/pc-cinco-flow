@@ -13,7 +13,7 @@ export default function ClientSelectField({
         required={required}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="bg-(--background) border border-(--border) rounded-lg px-3 py-2 text-sm text-(--text) focus:outline-none focus:border-(--primary) transition-colors"
+        className="min-h-11 bg-(--background) border border-(--border) rounded-lg px-3 py-2 text-sm text-(--text) focus:outline-none focus:border-(--primary) transition-colors"
       >
         <option value="">Selecciona un cliente...</option>
         {clients.map((client) => (

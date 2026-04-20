@@ -9,9 +9,9 @@ import {
   updateProjectExpense,
   deleteProjectExpense,
 } from "../services/projectExpense";
-import Modal from "../components/Modal";
 import Field from "../components/Field";
-import RowActions from "../components/RowActions";
+import CrudFormModal from "../components/CrudFormModal";
+import CrudTable from "../components/CrudTable";
 import { fmtDate } from "../services/api";
 
 const EMPTY = { name: "", description: "", amount: "" };
@@ -95,9 +95,33 @@ export default function ProjectDetail() {
   if (loading) return <p className="text-(--muted) text-sm">Cargando…</p>;
   if (error) return <p className="text-(--danger) text-sm">{error}</p>;
 
+  const expenseColumns = [
+    {
+      key: "name",
+      header: "Nombre",
+      cellClassName: "text-(--text) font-medium",
+      render: (expense) => expense.name,
+    },
+    {
+      key: "description",
+      header: "Descripción",
+      cellClassName: "text-(--muted) max-w-xs truncate",
+      render: (expense) => expense.description ?? "—",
+    },
+    {
+      key: "amount",
+      header: "Monto",
+      render: (expense) => `$${expense.amount.toFixed(2)}`,
+    },
+    {
+      key: "created",
+      header: "Creado",
+      render: (expense) => fmtDate(expense.created_at),
+    },
+  ];
+
   return (
     <div className="flex flex-col gap-6">
-      {/* Back + title */}
       <div>
         <Link
           to="/projects"
@@ -105,14 +129,13 @@ export default function ProjectDetail() {
         >
           ← Proyectos
         </Link>
-        <h1 className="text-xl font-semibold text-(--text) mt-1">
+        <h1 className="mt-1 text-2xl font-semibold text-(--text) sm:text-3xl">
           {project.name}
         </h1>
         <p className="text-sm text-(--muted) mt-0.5">{clientName}</p>
       </div>
 
-      {/* Project info cards */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <InfoCard
           label="Total Gastos"
           value={`$${totalExpenses.toFixed(2)}`}
@@ -141,13 +164,12 @@ export default function ProjectDetail() {
         />
       </div>
 
-      {/* Expenses section */}
       <div>
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-base font-semibold text-(--text)">Gastos</h2>
           <button
             onClick={() => setModal(EMPTY)}
-            className="px-4 py-2 bg-(--primary) text-white text-sm font-medium rounded-lg hover:opacity-90"
+            className="w-full rounded-lg bg-(--primary) px-4 py-3 text-sm font-medium text-white hover:opacity-90 sm:w-auto"
           >
             + Agregar Gasto
           </button>
@@ -156,102 +178,50 @@ export default function ProjectDetail() {
         {expenses.length === 0 ? (
           <p className="text-(--muted) text-sm">Sin gastos aún.</p>
         ) : (
-          <div className="bg-(--surface) rounded-xl border border-(--border) overflow-hidden">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-(--border) text-(--muted) text-left">
-                  <th className="px-4 py-3 font-medium">Nombre</th>
-                  <th className="px-4 py-3 font-medium">Descripción</th>
-                  <th className="px-4 py-3 font-medium">Monto</th>
-                  <th className="px-4 py-3 font-medium">Creado</th>
-                  <th className="px-4 py-3 w-32" />
-                </tr>
-              </thead>
-              <tbody>
-                {expenses.map((exp) => (
-                  <tr
-                    key={exp.id}
-                    className="border-b border-(--border) last:border-0 hover:bg-(--background)/40 transition-colors"
-                  >
-                    <td className="px-4 py-3 text-(--text) font-medium">
-                      {exp.name}
-                    </td>
-                    <td className="px-4 py-3 text-(--muted)">
-                      {exp.description ?? "—"}
-                    </td>
-                    <td className="px-4 py-3 text-(--muted)">
-                      ${exp.amount.toFixed(2)}
-                    </td>
-                    <td className="px-4 py-3 text-(--muted)">
-                      {fmtDate(exp.created_at)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <RowActions
-                        onEdit={() =>
-                          setModal({
-                            id: exp.id,
-                            name: exp.name,
-                            description: exp.description ?? "",
-                            amount: exp.amount,
-                          })
-                        }
-                        onDelete={() => handleDelete(exp)}
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <CrudTable
+            rows={expenses}
+            columns={expenseColumns}
+            getRowKey={(expense) => expense.id}
+            onEdit={(expense) =>
+              setModal({
+                id: expense.id,
+                name: expense.name,
+                description: expense.description ?? "",
+                amount: expense.amount,
+              })
+            }
+            onDelete={handleDelete}
+          />
         )}
       </div>
 
       {modal && (
-        <Modal
+        <CrudFormModal
           title={modal.id ? "Editar Gasto" : "Nuevo Gasto"}
           onClose={() => setModal(null)}
+          onSubmit={handleSubmit}
+          saving={saving}
+          isEdit={Boolean(modal.id)}
         >
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <Field
-              label="Nombre"
-              value={modal.name}
-              onChange={(v) => setModal((m) => ({ ...m, name: v }))}
-              required
-            />
-            <Field
-              label="Descripción"
-              value={modal.description}
-              onChange={(v) => setModal((m) => ({ ...m, description: v }))}
-            />
-            <Field
-              label="Monto ($)"
-              type="number"
-              value={modal.amount}
-              onChange={(v) => setModal((m) => ({ ...m, amount: v }))}
-              required
-            />
-            <div className="flex gap-3 justify-end pt-2">
-              <button
-                type="button"
-                onClick={() => setModal(null)}
-                className="px-4 py-2 text-sm text-(--muted) hover:text-(--text) transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                disabled={saving}
-                className="px-4 py-2 bg-(--primary) text-white text-sm font-medium rounded-lg hover:opacity-90 disabled:opacity-50 transition-opacity"
-              >
-                {saving
-                  ? "Guardando…"
-                  : modal.id
-                    ? "Guardar Cambios"
-                    : "Agregar"}
-              </button>
-            </div>
-          </form>
-        </Modal>
+          <Field
+            label="Nombre"
+            value={modal.name}
+            onChange={(v) => setModal((m) => ({ ...m, name: v }))}
+            required
+          />
+          <Field
+            label="Descripción"
+            value={modal.description}
+            onChange={(v) => setModal((m) => ({ ...m, description: v }))}
+          />
+          <Field
+            label="Monto ($)"
+            type="number"
+            value={modal.amount}
+            onChange={(v) => setModal((m) => ({ ...m, amount: v }))}
+            required
+          />
+        </CrudFormModal>
       )}
     </div>
   );
