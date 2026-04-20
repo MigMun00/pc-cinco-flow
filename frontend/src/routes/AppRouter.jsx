@@ -51,7 +51,10 @@ export default function AppRouter() {
           }
         />
         <Route path="/sign-in/*" element={<Navigate to="/login" replace />} />
-        <Route path="/sign-up/*" element={<Navigate to="/register" replace />} />
+        <Route
+          path="/sign-up/*"
+          element={<Navigate to="/register" replace />}
+        />
 
         {/* Protected with layout */}
         <Route
