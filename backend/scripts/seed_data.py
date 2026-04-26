@@ -195,10 +195,18 @@ PRODUCTOS = [
 
 def purge_user_data(db: Session, user_id: str) -> None:
     """Elimina datos del usuario respetando dependencias de llaves foraneas."""
-    db.query(ProjectExpense).filter(ProjectExpense.user_id == user_id).delete(synchronize_session=False)
-    db.query(Project).filter(Project.user_id == user_id).delete(synchronize_session=False)
-    db.query(Service).filter(Service.user_id == user_id).delete(synchronize_session=False)
-    db.query(Product).filter(Product.user_id == user_id).delete(synchronize_session=False)
+    db.query(ProjectExpense).filter(ProjectExpense.user_id == user_id).delete(
+        synchronize_session=False
+    )
+    db.query(Project).filter(Project.user_id == user_id).delete(
+        synchronize_session=False
+    )
+    db.query(Service).filter(Service.user_id == user_id).delete(
+        synchronize_session=False
+    )
+    db.query(Product).filter(Product.user_id == user_id).delete(
+        synchronize_session=False
+    )
     db.query(Client).filter(Client.user_id == user_id).delete(synchronize_session=False)
 
 
@@ -239,7 +247,9 @@ def seed(db: Session, user_id: str, clear_existing: bool) -> dict[str, int]:
     for item in GASTOS_PROYECTO:
         payload = item.copy()
         project_name = payload.pop("project_name")
-        expense = ProjectExpense(user_id=user_id, project_id=project_ids[project_name], **payload)
+        expense = ProjectExpense(
+            user_id=user_id, project_id=project_ids[project_name], **payload
+        )
         expense_records.append(expense)
 
     service_records: list[Service] = []
@@ -267,7 +277,9 @@ def seed(db: Session, user_id: str, clear_existing: bool) -> dict[str, int]:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Poblar la base de datos con datos demo en espanol")
+    parser = argparse.ArgumentParser(
+        description="Poblar la base de datos con datos demo en espanol"
+    )
     parser.add_argument(
         "--user-id",
         default="user_demo_pc_cinco",
@@ -285,7 +297,9 @@ def main() -> None:
     args = parse_args()
     db = SessionLocal()
     try:
-        summary = seed(db=db, user_id=args.user_id, clear_existing=not args.keep_existing)
+        summary = seed(
+            db=db, user_id=args.user_id, clear_existing=not args.keep_existing
+        )
     except Exception:
         db.rollback()
         raise
