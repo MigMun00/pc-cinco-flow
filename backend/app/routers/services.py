@@ -11,9 +11,15 @@ router = APIRouter(prefix="/services", tags=["services"])
 
 
 def resolve_product_price(db: Session, user_id: str, product_id: int) -> float:
-    product = db.query(Product).filter(Product.id == product_id, Product.user_id == user_id).first()
+    product = (
+        db.query(Product)
+        .filter(Product.id == product_id, Product.user_id == user_id)
+        .first()
+    )
     if not product:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Product not found"
+        )
     return product.price
 
 
@@ -38,9 +44,11 @@ def create_service(
 ):
     service_data = payload.model_dump()
 
-    if payload.product_id is not None:
+    if payload.amount is not None:
+        service_data["amount"] = payload.amount
+    elif payload.product_id is not None:
         service_data["amount"] = resolve_product_price(db, user_id, payload.product_id)
-    elif payload.amount is None:
+    else:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Amount is required when no product is selected",
@@ -53,7 +61,10 @@ def create_service(
         db.refresh(service)
     except Exception:
         db.rollback()
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to create service")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to create service",
+        )
     return service
 
 
@@ -64,14 +75,20 @@ def update_service(
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user),
 ):
-    service = db.query(Service).filter(Service.id == service_id, Service.user_id == user_id).first()
+    service = (
+        db.query(Service)
+        .filter(Service.id == service_id, Service.user_id == user_id)
+        .first()
+    )
     if not service:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Service not found"
+        )
 
     update_data = payload.model_dump(exclude_unset=True)
     resolved_product_id = update_data.get("product_id", service.product_id)
 
-    if resolved_product_id is not None:
+    if "amount" not in update_data and resolved_product_id is not None and "product_id" in update_data:
         update_data["amount"] = resolve_product_price(db, user_id, resolved_product_id)
 
     for field, value in update_data.items():
@@ -81,7 +98,10 @@ def update_service(
         db.refresh(service)
     except Exception:
         db.rollback()
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to update service")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to update service",
+        )
     return service
 
 
@@ -91,12 +111,21 @@ def delete_service(
     db: Session = Depends(get_db),
     user_id: str = Depends(get_current_user),
 ):
-    service = db.query(Service).filter(Service.id == service_id, Service.user_id == user_id).first()
+    service = (
+        db.query(Service)
+        .filter(Service.id == service_id, Service.user_id == user_id)
+        .first()
+    )
     if not service:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Service not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Service not found"
+        )
     db.delete(service)
     try:
         db.commit()
     except Exception:
         db.rollback()
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to delete service")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to delete service",
+        )

@@ -310,7 +310,6 @@ export default function Services() {
             type="number"
             value={modal.amount}
             onChange={(value) => setModal((m) => ({ ...m, amount: value }))}
-            disabled
             min="0"
             step="0.01"
             required

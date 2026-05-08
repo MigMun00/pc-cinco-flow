@@ -39,7 +39,7 @@ export function useDashboardAnalytics() {
     }
 
     load();
-  }, [getToken]);
+  }, []);
 
   const analytics = useMemo(() => {
     const clientStats = new Map(
