@@ -12,6 +12,7 @@ app.include_router(projects.router)
 app.include_router(services.router)
 app.include_router(project_expenses.router)
 
+
 @app.get("/")
 def root():
     return {"status": "ok"}
