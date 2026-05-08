@@ -93,18 +93,16 @@ export default function Services() {
       const { id, ...fields } = modal;
       const amount = parseFloat(fields.amount);
 
-      if (!fields.product_id) {
-        throw new Error("Selecciona un producto para el servicio.");
-      }
-
       if (Number.isNaN(amount)) {
         throw new Error("El monto debe ser un numero valido.");
       }
 
+      const productId = fields.product_id ? Number(fields.product_id) : null;
+
       const payload = {
         ...fields,
         client_id: Number(fields.client_id),
-        product_id: Number(fields.product_id),
+        product_id: productId,
         amount,
         description: fields.description || null,
       };
@@ -304,6 +302,7 @@ export default function Services() {
             value={modal.product_id}
             products={products}
             onChange={handleProductChange}
+            required={false}
           />
           <Field
             label="Monto ($)"

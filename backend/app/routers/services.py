@@ -88,7 +88,11 @@ def update_service(
     update_data = payload.model_dump(exclude_unset=True)
     resolved_product_id = update_data.get("product_id", service.product_id)
 
-    if "amount" not in update_data and resolved_product_id is not None and "product_id" in update_data:
+    if (
+        "amount" not in update_data
+        and resolved_product_id is not None
+        and "product_id" in update_data
+    ):
         update_data["amount"] = resolve_product_price(db, user_id, resolved_product_id)
 
     for field, value in update_data.items():
