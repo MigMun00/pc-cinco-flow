@@ -39,7 +39,7 @@ export function useDashboardAnalytics() {
     }
 
     load();
-  }, []);
+  }, [getToken]);
 
   const analytics = useMemo(() => {
     const clientStats = new Map(
@@ -107,11 +107,12 @@ export function useDashboardAnalytics() {
         stat.totalInvoiced += service.amount;
         totalInvoicedIncome += service.amount;
       } else {
+        const description = service.description?.trim();
         stat.totalPending += service.amount;
         stat.pendingServicesCount += 1;
         stat.pendingServices.push({
           id: service.id,
-          name: service.name,
+          name: description ?? `Servicio #${service.id}`,
           amount: service.amount,
         });
         totalPendingIncome += service.amount;

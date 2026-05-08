@@ -19,7 +19,6 @@ import InvoicedBadge from "../components/InvoicedBadge";
 import ProductSelectField from "../components/ProductSelectField";
 
 const EMPTY_SERVICE = {
-  name: "",
   description: "",
   client_id: "",
   amount: "",
@@ -68,6 +67,11 @@ export default function Services() {
 
   function getProduct(productId) {
     return products.find((product) => product.id === productId) ?? null;
+  }
+
+  function getServiceLabel(service) {
+    const description = service.description?.trim();
+    return getProduct(service.product_id)?.name ?? description ?? `Servicio #${service.id}`;
   }
 
   function handleProductChange(productId) {
@@ -121,7 +125,7 @@ export default function Services() {
   }
 
   async function handleDelete(service) {
-    if (!window.confirm(`¿Eliminar "${service.name}"?`)) return;
+    if (!window.confirm(`¿Eliminar "${getServiceLabel(service)}"?`)) return;
 
     try {
       const token = await getToken();
@@ -135,12 +139,6 @@ export default function Services() {
   }
 
   const columns = [
-    {
-      key: "name",
-      header: "Nombre",
-      cellClassName: "text-(--text) font-medium",
-      render: (service) => service.name,
-    },
     {
       key: "client",
       header: "Cliente",
@@ -233,7 +231,6 @@ export default function Services() {
                 onEdit={(service) =>
                   setModal({
                     id: service.id,
-                    name: service.name,
                     description: service.description ?? "",
                     client_id: service.client_id,
                     product_id: service.product_id ?? "",
@@ -265,7 +262,6 @@ export default function Services() {
                 onEdit={(service) =>
                   setModal({
                     id: service.id,
-                    name: service.name,
                     description: service.description ?? "",
                     client_id: service.client_id,
                     product_id: service.product_id ?? "",
@@ -292,12 +288,6 @@ export default function Services() {
           saving={saving}
           isEdit={Boolean(modal.id)}
         >
-          <Field
-            label="Nombre"
-            value={modal.name}
-            onChange={(value) => setModal((m) => ({ ...m, name: value }))}
-            required
-          />
           <Field
             label="Descripcion"
             value={modal.description}

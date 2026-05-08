@@ -17,7 +17,6 @@ class Service(Base):
         Integer, ForeignKey("products.id", ondelete="SET NULL"), nullable=True
     )
 
-    name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=True)
 
     amount: Mapped[float] = mapped_column(Float, nullable=False)

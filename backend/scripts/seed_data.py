@@ -19,7 +19,6 @@ from app.models.project import Project
 from app.models.project_expense import ProjectExpense
 from app.models.service import Service
 
-
 CLIENTES = [
     {
         "name": "Panaderia La Espiga",
@@ -148,35 +147,30 @@ GASTOS_PROYECTO = [
 SERVICIOS = [
     {
         "client_name": "Panaderia La Espiga",
-        "name": "Limpieza mensual de equipos",
         "product_name": "Mantenimiento Preventivo",
         "description": "Limpieza preventiva de 6 computadoras de caja y administracion.",
         "invoiced": True,
     },
     {
         "client_name": "Hotel Mirador Andino",
-        "name": "Soporte remoto de conectividad",
         "product_name": "Soporte Remoto",
         "description": "Monitoreo y soporte remoto para incidencias de internet y red wifi.",
         "invoiced": False,
     },
     {
         "client_name": "Clinica Santa Teresa",
-        "name": "Instalacion de antivirus en recepcion",
         "product_name": "Instalacion de Antivirus",
         "description": "Instalacion y configuracion de politicas de escaneo en 4 equipos.",
         "invoiced": True,
     },
     {
         "client_name": "Ferreteria El Tornillo",
-        "name": "Reparacion de computadora de inventario",
         "product_name": "Reparacion de PC",
         "description": "Cambio de fuente de poder, limpieza y recuperacion de sistema.",
         "invoiced": False,
     },
     {
         "client_name": "Unidad Educativa Nuevo Horizonte",
-        "name": "Configuracion de router y VLAN",
         "product_name": "Configuracion de Red",
         "description": "Segmentacion de trafico para docentes, administrativos y estudiantes.",
         "invoiced": False,

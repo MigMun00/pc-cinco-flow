@@ -5,7 +5,6 @@ from datetime import datetime
 
 class ServiceBase(BaseModel):
     client_id: int
-    name: str
     description: Optional[str] = None
     invoiced: bool = False
     product_id: Optional[int] = None
@@ -17,7 +16,6 @@ class ServiceCreate(ServiceBase):
 
 class ServiceUpdate(BaseModel):
     client_id: Optional[int] = None
-    name: Optional[str] = None
     description: Optional[str] = None
     amount: Optional[float] = None
     invoiced: Optional[bool] = None
