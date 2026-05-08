@@ -1,6 +1,6 @@
-from sqlalchemy import Integer, String, Text, ForeignKey, Float, DateTime, Boolean
+from sqlalchemy import Integer, String, Text, ForeignKey, Float, DateTime, Boolean, Date
 from sqlalchemy.orm import Mapped, mapped_column
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 
 from app.models.base import Base
 
@@ -20,6 +20,7 @@ class Service(Base):
     description: Mapped[str] = mapped_column(Text, nullable=True)
 
     amount: Mapped[float] = mapped_column(Float, nullable=False)
+    service_date: Mapped[date] = mapped_column(Date, nullable=False, default=date.today)
     invoiced: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     created_at: Mapped[datetime] = mapped_column(

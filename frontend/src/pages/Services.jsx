@@ -8,7 +8,7 @@ import {
 } from "../services/service";
 import { getClients } from "../services/client";
 import { getProducts } from "../services/product";
-import { fmtDate, money } from "../services/api";
+import { money } from "../services/api";
 import Field from "../components/Field";
 import PageHeader from "../components/PageHeader";
 import CrudState from "../components/CrudState";
@@ -18,13 +18,22 @@ import ClientSelectField from "../components/ClientSelectField";
 import InvoicedBadge from "../components/InvoicedBadge";
 import ProductSelectField from "../components/ProductSelectField";
 
-const EMPTY_SERVICE = {
-  description: "",
-  client_id: "",
-  amount: "",
-  product_id: "",
-  invoiced: false,
-};
+function todayDateInputValue() {
+  const now = new Date();
+  const timezoneOffsetMs = now.getTimezoneOffset() * 60 * 1000;
+  return new Date(now.getTime() - timezoneOffsetMs).toISOString().slice(0, 10);
+}
+
+function createEmptyService() {
+  return {
+    description: "",
+    client_id: "",
+    amount: "",
+    product_id: "",
+    service_date: todayDateInputValue(),
+    invoiced: false,
+  };
+}
 
 export default function Services() {
   const { getToken } = useAuth();
@@ -104,6 +113,7 @@ export default function Services() {
         client_id: Number(fields.client_id),
         product_id: productId,
         amount,
+        service_date: fields.service_date,
         description: fields.description || null,
       };
 
@@ -164,9 +174,9 @@ export default function Services() {
       render: (service) => <InvoicedBadge invoiced={service.invoiced} />,
     },
     {
-      key: "created",
-      header: "Creado",
-      render: (service) => fmtDate(service.created_at),
+      key: "service_date",
+      header: "Fecha servicio",
+      render: (service) => service.service_date ?? "—",
     },
   ];
 
@@ -185,7 +195,7 @@ export default function Services() {
       <PageHeader
         title="Servicios"
         action="+ Nuevo Servicio"
-        onAction={() => setModal(EMPTY_SERVICE)}
+        onAction={() => setModal(createEmptyService())}
       />
 
       <div className="mb-6 max-w-sm">
@@ -233,6 +243,7 @@ export default function Services() {
                     client_id: service.client_id,
                     product_id: service.product_id ?? "",
                     amount: service.amount,
+                    service_date: service.service_date,
                     invoiced: service.invoiced,
                   })
                 }
@@ -264,6 +275,7 @@ export default function Services() {
                     client_id: service.client_id,
                     product_id: service.product_id ?? "",
                     amount: service.amount,
+                    service_date: service.service_date,
                     invoiced: service.invoiced,
                   })
                 }
@@ -311,6 +323,13 @@ export default function Services() {
             onChange={(value) => setModal((m) => ({ ...m, amount: value }))}
             min="0"
             step="0.01"
+            required
+          />
+          <Field
+            label="Fecha del servicio"
+            type="date"
+            value={modal.service_date}
+            onChange={(value) => setModal((m) => ({ ...m, service_date: value }))}
             required
           />
           <label className="flex items-center gap-2 cursor-pointer">
