@@ -29,8 +29,8 @@ services:
       db:
         condition: service_healthy
 
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/pc_cinco_flow
+    env_file:
+      - ./backend/.env
 
     ports:
       - "8001:8000"
@@ -46,7 +46,7 @@ services:
       - backend
 
     ports:
-      - "3001:3000"
+      - "3001:80"
 
 volumes:
   pc_cinco_flow_postgres_data:
